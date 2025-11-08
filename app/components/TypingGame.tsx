@@ -47,8 +47,64 @@ export default function TypingGame() {
     initializeGame();
   }, [initializeGame]);
 
+  // Text-to-speech effect - reads out the word whenever it changes
+  useEffect(() => {
+    if (!currentWord) return;
+
+    // Check if speech synthesis is available
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(currentWord);
+      utterance.rate = 0.8; // Slightly slower for clarity
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      // Cancel any ongoing speech before starting new one
+      window.speechSynthesis.cancel();
+
+      // 1 second delay before saying the initial word
+      setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 1000);
+    }
+  }, [currentWord, selectedVoice]);
+
+  // Text-to-speech effect - reads out the current letter being waited for
+  useEffect(() => {
+    if (!currentWord || currentIndex >= currentWord.length) return;
+
+    const currentLetter = currentWord[currentIndex];
+
+    // Check if speech synthesis is available
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(currentLetter);
+      utterance.rate = 0.7; // Even slower for individual letters
+      utterance.pitch = 1.1; // Slightly higher pitch for letters
+      utterance.volume = 1;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      // Delay to speak letter after the word is spoken
+      const timeoutId = setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, currentIndex === 0 ? 3000 : 1500); // Longer delay for first letter
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentWord, currentIndex, selectedVoice]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle space key to move to next word
+      if (e.key === ' ') {
+        e.preventDefault();
+        initializeGame();
+        return;
+      }
+
       // Ignore special keys except Backspace
       if (e.key.length > 1 && e.key !== 'Backspace') return;
 
@@ -94,9 +150,24 @@ export default function TypingGame() {
 
           if (allCorrect) {
             setShowConfetti(true);
+
+            // Speak the word again to celebrate completion
+            if ('speechSynthesis' in window) {
+              setTimeout(() => {
+                const celebrationUtterance = new SpeechSynthesisUtterance(currentWord);
+                celebrationUtterance.rate = 0.8;
+                celebrationUtterance.pitch = 1.2; // Higher pitch for celebration
+                celebrationUtterance.volume = 1;
+                if (selectedVoice) {
+                  celebrationUtterance.voice = selectedVoice;
+                }
+                window.speechSynthesis.speak(celebrationUtterance);
+              }, 500);
+            }
+
             setTimeout(() => {
               initializeGame();
-            }, 3000);
+            }, 6000);
           }
         }
 
