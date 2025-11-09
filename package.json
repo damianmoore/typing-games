@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@diffusionstudio/vits-web": "^1.0.3",
     "autoprefixer": "^10.4.21",
     "daisyui": "^5.4.7",
     "next": "16.0.1",

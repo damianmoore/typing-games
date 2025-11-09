@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import Confetti from 'react-confetti';
 import useWindowSize from '../hooks/useWindowSize';
+import { usePiperTTS } from '../hooks/usePiperTTS';
+import TTSModeSelector from './TTSModeSelector';
 
 const WORD_LIST = [
   // 'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN',
@@ -26,6 +28,7 @@ export default function TypingGame() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
+  const { speak, isReady: ttsReady, setMode } = usePiperTTS();
 
   const getRandomWord = useCallback(() => {
     return WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
@@ -51,46 +54,39 @@ export default function TypingGame() {
 
   // Text-to-speech effect - reads out the word whenever it changes
   useEffect(() => {
-    if (!currentWord) return;
+    if (!currentWord || !ttsReady) return;
 
-    // Check if speech synthesis is available
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(currentWord);
-      utterance.rate = 0.8; // Slightly slower for clarity
-      utterance.pitch = 1;
-      utterance.volume = 1;
+    const speakWord = async () => {
+      try {
+        await speak(currentWord);
+      } catch (err) {
+        console.error('Failed to speak word:', err);
+      }
+    };
 
-      // Cancel any ongoing speech before starting new one
-      window.speechSynthesis.cancel();
-
-      // 1 second delay before saying the initial word
-      setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-      }, 1000);
-    }
-  }, [currentWord]);
+    // 1 second delay before saying the initial word
+    const timeoutId = setTimeout(speakWord, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [currentWord, ttsReady, speak]);
 
   // Text-to-speech effect - reads out the current letter being waited for
   useEffect(() => {
-    if (!currentWord || currentIndex >= currentWord.length) return;
+    if (!currentWord || currentIndex >= currentWord.length || !ttsReady) return;
 
     const currentLetter = currentWord[currentIndex];
 
-    // Check if speech synthesis is available
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(currentLetter);
-      utterance.rate = 0.7; // Even slower for individual letters
-      utterance.pitch = 1.1; // Slightly higher pitch for letters
-      utterance.volume = 1;
+    const speakLetter = async () => {
+      try {
+        await speak(currentLetter);
+      } catch (err) {
+        console.error('Failed to speak letter:', err);
+      }
+    };
 
-      // Delay to speak letter after the word is spoken
-      const timeoutId = setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-      }, currentIndex === 0 ? 3000 : 1500); // Longer delay for first letter
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [currentWord, currentIndex]);
+    // Delay to speak letter after the word is spoken
+    const timeoutId = setTimeout(speakLetter, currentIndex === 0 ? 3000 : 1500);
+    return () => clearTimeout(timeoutId);
+  }, [currentWord, currentIndex, ttsReady, speak]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -148,13 +144,13 @@ export default function TypingGame() {
             setShowConfetti(true);
 
             // Speak the word again to celebrate completion
-            if ('speechSynthesis' in window) {
-              setTimeout(() => {
-                const celebrationUtterance = new SpeechSynthesisUtterance(currentWord);
-                celebrationUtterance.rate = 0.8;
-                celebrationUtterance.pitch = 1.2; // Higher pitch for celebration
-                celebrationUtterance.volume = 1;
-                window.speechSynthesis.speak(celebrationUtterance);
+            if (ttsReady) {
+              setTimeout(async () => {
+                try {
+                  await speak(currentWord);
+                } catch (err) {
+                  console.error('Failed to speak celebration:', err);
+                }
               }, 500);
             }
 
@@ -190,6 +186,8 @@ export default function TypingGame() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <TTSModeSelector onModeChange={setMode} />
+
       {showConfetti && width && height && (
         <Confetti
           width={width}
