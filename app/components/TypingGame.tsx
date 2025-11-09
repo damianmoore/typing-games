@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Confetti from 'react-confetti';
 import useWindowSize from '../hooks/useWindowSize';
 import { usePiperTTS } from '../hooks/usePiperTTS';
-import TTSModeSelector from './TTSModeSelector';
+import Celebration from './Celebration';
+import TextInput from './TextInput';
+import QuestionDisplay from './QuestionDisplay';
+import GameLayout from './GameLayout';
 
 const WORD_LIST = [
   'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN',
@@ -185,63 +187,19 @@ export default function TypingGame() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <TTSModeSelector onModeChange={setMode} />
+    <GameLayout onModeChange={setMode}>
+      <Celebration show={showConfetti} />
 
-      {showConfetti && width && height && (
-        <Confetti
-          width={width}
-          height={height}
-          recycle={false}
-          numberOfPieces={500}
-        />
-      )}
+      <QuestionDisplay
+        content={currentWord}
+        fontSize={`${Math.min(parseFloat(calculateFontSize()) * 0.6, 120)}px`}
+      />
 
-      {/* Word Display */}
-      <div className="mb-16 text-center">
-        <div
-          className="font-bold tracking-wider"
-          style={{ fontSize: `${Math.min(parseFloat(calculateFontSize()) * 0.6, 120)}px` }}
-        >
-          {currentWord}
-        </div>
-      </div>
-
-      {/* Letter Blanks */}
-      <div className="flex gap-2 md:gap-4 flex-wrap justify-center">
-        {letterStates.map((letter, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-center relative"
-          >
-            {/* Typed letter displayed on top */}
-            <div
-              className={`font-bold transition-all duration-300 mb-2 ${
-                letter.status === 'empty' ? 'opacity-0' : 'opacity-100'
-              }`}
-              style={{
-                fontSize: calculateFontSize(),
-                lineHeight: '1.2',
-                minHeight: `${parseFloat(calculateFontSize()) * 1.2}px`,
-                color: letter.status === 'incorrect' ? '#ff0000' : letter.status === 'correct' ? '#00aa00' : 'inherit',
-              }}
-            >
-              {letter.typedChar || '\u00A0'}
-            </div>
-            {/* Fixed underscore line */}
-            <div
-              className={`transition-all duration-300 ${
-                index === currentIndex ? 'animate-pulse bg-primary' : 'bg-base-300'
-              }`}
-              style={{
-                width: `${parseFloat(calculateFontSize()) * 1.0}px`,
-                height: '8px',
-                borderRadius: '4px'
-              }}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
+      <TextInput
+        letterStates={letterStates}
+        currentIndex={currentIndex}
+        fontSize={calculateFontSize()}
+      />
+    </GameLayout>
   );
 }
