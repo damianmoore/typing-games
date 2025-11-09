@@ -7,12 +7,12 @@ import { usePiperTTS } from '../hooks/usePiperTTS';
 import TTSModeSelector from './TTSModeSelector';
 
 const WORD_LIST = [
-  // 'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN',
-  // 'EDEN', 'FERN', 'GREY', 'IVY', 'JAY', 'KELLY', 'LOGAN', 'NOVA', 'OLIVE', 'PARKER', 'SCOUT',
-  // 'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY',
-  // 'ELEPHANT', 'MOUNTAIN', 'ADVENTURE', 'TREASURE', 'GARDEN',
-  // 'OCEAN', 'PLANET', 'ROCKET', 'CASTLE', 'DRAGON',
-  // 'UNICORN', 'WIZARD', 'FOREST', 'WATERFALL', 'CHAMPION'
+  'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN',
+  'EDEN', 'FERN', 'GREY', 'IVY', 'JAY', 'KELLY', 'LOGAN', 'NOVA', 'OLIVE', 'PARKER', 'SCOUT',
+  'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY',
+  'ELEPHANT', 'MOUNTAIN', 'ADVENTURE', 'TREASURE', 'GARDEN',
+  'OCEAN', 'PLANET', 'ROCKET', 'CASTLE', 'DRAGON',
+  'UNICORN', 'WIZARD', 'FOREST', 'WATERFALL', 'CHAMPION',
   'EAT', 'DRINK', 'MORE', 'DONE', 'STOP', 'GO', 'HELP', 'OPEN', 'WALK', 'RUN', 'PLAY', 'JUMP', 'BABY', 'COW', 'FISH', 'DUCK', 'CAT', 'DOG', 'MILK', 'COOKIE', 'WATER', 'JUICE', 'APPLE', 'BANANA', 'CEREAL', 'BOOK', 'BALL', 'BUBBLES', 'TREE', 'SUN', 'SHOES', 'HOT', 'IN', 'ON', 'UP', 'DOWN', 'PLEASE', 'ME', 'YOU', 'HI', 'BYE', 'YES', 'NO', 'BIG', 'LITTLE', 'CAR', 'BED',
 ];
 
@@ -179,9 +179,9 @@ export default function TypingGame() {
     const widthBasedSize = availableWidth / (wordLength * 0.6); // 0.6 is approx char width ratio
     const heightBasedSize = availableHeight;
 
-    const fontSize = Math.min(widthBasedSize, heightBasedSize, 200); // Max 200px
+    const fontSize = Math.min(widthBasedSize, heightBasedSize, 200) * 0.8; // Max 200px, scaled to 80%
 
-    return `${Math.max(fontSize, 60)}px`; // Min 60px
+    return `${Math.max(fontSize, 48)}px`; // Min 48px (80% of 60)
   };
 
   return (
@@ -234,7 +234,7 @@ export default function TypingGame() {
                 index === currentIndex ? 'animate-pulse bg-primary' : 'bg-base-300'
               }`}
               style={{
-                width: `${parseFloat(calculateFontSize()) * 0.5}px`,
+                width: `${parseFloat(calculateFontSize()) * 1.0}px`,
                 height: '8px',
                 borderRadius: '4px'
               }}
