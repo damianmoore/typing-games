@@ -5,11 +5,13 @@ import Confetti from 'react-confetti';
 import useWindowSize from '../hooks/useWindowSize';
 
 const WORD_LIST = [
-  'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD',
-  'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY',
-  'ELEPHANT', 'MOUNTAIN', 'ADVENTURE', 'TREASURE', 'GARDEN',
-  'OCEAN', 'PLANET', 'ROCKET', 'CASTLE', 'DRAGON',
-  'UNICORN', 'WIZARD', 'FOREST', 'WATERFALL', 'CHAMPION'
+  // 'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN',
+  // 'EDEN', 'FERN', 'GREY', 'IVY', 'JAY', 'KELLY', 'LOGAN', 'NOVA', 'OLIVE', 'PARKER', 'SCOUT',
+  // 'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY',
+  // 'ELEPHANT', 'MOUNTAIN', 'ADVENTURE', 'TREASURE', 'GARDEN',
+  // 'OCEAN', 'PLANET', 'ROCKET', 'CASTLE', 'DRAGON',
+  // 'UNICORN', 'WIZARD', 'FOREST', 'WATERFALL', 'CHAMPION'
+  'EAT', 'DRINK', 'MORE', 'DONE', 'STOP', 'GO', 'HELP', 'OPEN', 'WALK', 'RUN', 'PLAY', 'JUMP', 'BABY', 'COW', 'FISH', 'DUCK', 'CAT', 'DOG', 'MILK', 'COOKIE', 'WATER', 'JUICE', 'APPLE', 'BANANA', 'CEREAL', 'BOOK', 'BALL', 'BUBBLES', 'TREE', 'SUN', 'SHOES', 'HOT', 'IN', 'ON', 'UP', 'DOWN', 'PLEASE', 'ME', 'YOU', 'HI', 'BYE', 'YES', 'NO', 'BIG', 'LITTLE', 'CAR', 'BED',
 ];
 
 interface LetterState {
@@ -57,9 +59,6 @@ export default function TypingGame() {
       utterance.rate = 0.8; // Slightly slower for clarity
       utterance.pitch = 1;
       utterance.volume = 1;
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
 
       // Cancel any ongoing speech before starting new one
       window.speechSynthesis.cancel();
@@ -69,7 +68,7 @@ export default function TypingGame() {
         window.speechSynthesis.speak(utterance);
       }, 1000);
     }
-  }, [currentWord, selectedVoice]);
+  }, [currentWord]);
 
   // Text-to-speech effect - reads out the current letter being waited for
   useEffect(() => {
@@ -83,9 +82,6 @@ export default function TypingGame() {
       utterance.rate = 0.7; // Even slower for individual letters
       utterance.pitch = 1.1; // Slightly higher pitch for letters
       utterance.volume = 1;
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-      }
 
       // Delay to speak letter after the word is spoken
       const timeoutId = setTimeout(() => {
@@ -94,7 +90,7 @@ export default function TypingGame() {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [currentWord, currentIndex, selectedVoice]);
+  }, [currentWord, currentIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -158,9 +154,6 @@ export default function TypingGame() {
                 celebrationUtterance.rate = 0.8;
                 celebrationUtterance.pitch = 1.2; // Higher pitch for celebration
                 celebrationUtterance.volume = 1;
-                if (selectedVoice) {
-                  celebrationUtterance.voice = selectedVoice;
-                }
                 window.speechSynthesis.speak(celebrationUtterance);
               }, 500);
             }
