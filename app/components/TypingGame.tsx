@@ -10,20 +10,14 @@ import GameLayout from './GameLayout';
 import GameHeader from './GameHeader';
 
 const WORD_GROUPS = {
-  family: [
-    'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY',
-    'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN', 'JAMIE', 'DREW', 'ROWAN',
-    'AVERY', 'BLAKE', 'CASEY', 'DANA', 'EDEN', 'FERN', 'GREY', 'IVY', 'JAY',
-    'KELLY', 'LOGAN', 'NOVA', 'OLIVE', 'PARKER', 'SCOUT', 'TATE', 'WREN',
-  ],
   everyday: [
     'EAT', 'DRINK', 'MORE', 'DONE', 'STOP', 'GO', 'HELP', 'OPEN', 'WALK', 'RUN',
     'PLAY', 'JUMP', 'MILK', 'COOKIE', 'WATER', 'JUICE', 'CEREAL', 'BOOK', 'BALL',
     'BUBBLES', 'SHOES', 'HOT', 'IN', 'ON', 'UP', 'DOWN', 'PLEASE', 'ME', 'YOU',
-    'HI', 'BYE', 'YES', 'NO', 'BIG', 'LITTLE', 'BED',
+    'HI', 'BYE', 'YES', 'NO', 'BIG', 'LITTLE', 'BED', 'TREE', 'SUN',
   ],
   animals: [
-    'BABY', 'COW', 'FISH', 'DUCK', 'CAT', 'DOG', 'TREE', 'SUN',
+    'BABY', 'COW', 'FISH', 'DUCK', 'CAT', 'DOG',
   ],
   fun: [
     'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY', 'ELEPHANT',
@@ -46,19 +40,30 @@ export default function TypingGame() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [enabledGroups, setEnabledGroups] = useState<Record<WordGroupKey, boolean>>({
-    family: true,
     everyday: true,
     animals: true,
     fun: true,
   });
+  const [customWords, setCustomWords] = useState<string>('');
+  const [customWordsEnabled, setCustomWordsEnabled] = useState<boolean>(true);
   const { width, height } = useWindowSize();
   const { speak, isReady: ttsReady, setMode } = usePiperTTS();
 
-  // Load enabled groups from localStorage
+  // Load enabled groups and custom words from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('typingGameEnabledGroups');
     if (saved) {
       setEnabledGroups(JSON.parse(saved));
+    }
+
+    const savedCustomWords = localStorage.getItem('typingGameCustomWords');
+    if (savedCustomWords) {
+      setCustomWords(savedCustomWords);
+    }
+
+    const savedCustomWordsEnabled = localStorage.getItem('typingGameCustomWordsEnabled');
+    if (savedCustomWordsEnabled !== null) {
+      setCustomWordsEnabled(JSON.parse(savedCustomWordsEnabled));
     }
   }, []);
 
@@ -71,17 +76,42 @@ export default function TypingGame() {
     });
   }, []);
 
+  // Handle custom words change
+  const handleCustomWordsChange = useCallback((value: string) => {
+    setCustomWords(value);
+    localStorage.setItem('typingGameCustomWords', value);
+  }, []);
+
+  // Toggle custom words enabled
+  const toggleCustomWords = useCallback(() => {
+    setCustomWordsEnabled(prev => {
+      const newValue = !prev;
+      localStorage.setItem('typingGameCustomWordsEnabled', JSON.stringify(newValue));
+      return newValue;
+    });
+  }, []);
+
   const getAvailableWords = useCallback(() => {
     const allWords = Object.entries(WORD_GROUPS)
       .filter(([key]) => enabledGroups[key as WordGroupKey])
       .flatMap(([, words]) => words);
+
+    // Parse and add custom words if enabled
+    if (customWordsEnabled && customWords.trim()) {
+      const parsedCustomWords = customWords
+        .split(/[,\n]/)
+        .map(word => word.trim().toUpperCase())
+        .filter(word => word.length > 0);
+      allWords.push(...parsedCustomWords);
+    }
+
     return allWords;
-  }, [enabledGroups]);
+  }, [enabledGroups, customWords, customWordsEnabled]);
 
   const getRandomWord = useCallback(() => {
     const availableWords = getAvailableWords();
     if (availableWords.length === 0) {
-      return WORD_GROUPS.family[0];
+      return WORD_GROUPS.everyday[0];
     }
     return availableWords[Math.floor(Math.random() * availableWords.length)];
   }, [getAvailableWords]);
@@ -90,7 +120,7 @@ export default function TypingGame() {
     const word = getRandomWord();
     setCurrentWord(word);
     setLetterStates(
-      word.split('').map(char => ({
+      word.split('').map((char: string) => ({
         expectedChar: char,
         typedChar: '',
         status: 'empty'
@@ -142,6 +172,12 @@ export default function TypingGame() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore keyboard events when typing in input/textarea elements
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return;
+      }
+
       // Handle space key to move to next word
       if (e.key === ' ') {
         e.preventDefault();
@@ -260,19 +296,40 @@ export default function TypingGame() {
         <h4 className="font-semibold mb-2">Word Groups</h4>
         <div className="space-y-2">
           {(Object.keys(WORD_GROUPS) as WordGroupKey[]).map((groupKey) => (
-            <div key={groupKey} className="form-control">
-              <label className="label cursor-pointer justify-start gap-3">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  checked={enabledGroups[groupKey]}
-                  onChange={() => toggleGroup(groupKey)}
-                />
-                <span className="label-text capitalize">{groupKey}</span>
-              </label>
+            <div key={groupKey} className="flex items-center justify-between">
+              <span className="label-text capitalize">{groupKey}</span>
+              <input
+                type="checkbox"
+                className="toggle toggle-primary"
+                checked={enabledGroups[groupKey]}
+                onChange={() => toggleGroup(groupKey)}
+              />
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Custom Words */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="font-semibold">Custom Words</h4>
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={customWordsEnabled}
+            onChange={toggleCustomWords}
+          />
+        </div>
+        <p className="text-sm text-base-content/70 mb-2">
+          Enter custom words separated by commas or line breaks
+        </p>
+        <textarea
+          value={customWords}
+          onChange={(e) => handleCustomWordsChange(e.target.value)}
+          placeholder="APPLE, BANANA, ORANGE&#10;GRAPE&#10;MELON"
+          className="textarea textarea-bordered w-full h-32"
+          disabled={!customWordsEnabled}
+        />
       </div>
     </div>
   );
