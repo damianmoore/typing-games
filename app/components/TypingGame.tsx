@@ -7,16 +7,32 @@ import Celebration from './Celebration';
 import TextInput from './TextInput';
 import QuestionDisplay from './QuestionDisplay';
 import GameLayout from './GameLayout';
+import GameHeader from './GameHeader';
 
-const WORD_LIST = [
-  'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY', 'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN',
-  'EDEN', 'FERN', 'GREY', 'IVY', 'JAY', 'KELLY', 'LOGAN', 'NOVA', 'OLIVE', 'PARKER', 'SCOUT',
-  'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY',
-  'ELEPHANT', 'MOUNTAIN', 'ADVENTURE', 'TREASURE', 'GARDEN',
-  'OCEAN', 'PLANET', 'ROCKET', 'CASTLE', 'DRAGON',
-  'UNICORN', 'WIZARD', 'FOREST', 'WATERFALL', 'CHAMPION',
-  'EAT', 'DRINK', 'MORE', 'DONE', 'STOP', 'GO', 'HELP', 'OPEN', 'WALK', 'RUN', 'PLAY', 'JUMP', 'BABY', 'COW', 'FISH', 'DUCK', 'CAT', 'DOG', 'MILK', 'COOKIE', 'WATER', 'JUICE', 'APPLE', 'BANANA', 'CEREAL', 'BOOK', 'BALL', 'BUBBLES', 'TREE', 'SUN', 'SHOES', 'HOT', 'IN', 'ON', 'UP', 'DOWN', 'PLEASE', 'ME', 'YOU', 'HI', 'BYE', 'YES', 'NO', 'BIG', 'LITTLE', 'CAR', 'BED',
-];
+const WORD_GROUPS = {
+  family: [
+    'MAPLE', 'RIVER', 'FINN', 'IVYR', 'WILLOW', 'SAGE', 'MUMMY', 'DADDY',
+    'GRANDMA', 'GRANDAD', 'ALEX', 'MORGAN', 'QUINN', 'JAMIE', 'DREW', 'ROWAN',
+    'AVERY', 'BLAKE', 'CASEY', 'DANA', 'EDEN', 'FERN', 'GREY', 'IVY', 'JAY',
+    'KELLY', 'LOGAN', 'NOVA', 'OLIVE', 'PARKER', 'SCOUT', 'TATE', 'WREN',
+  ],
+  everyday: [
+    'EAT', 'DRINK', 'MORE', 'DONE', 'STOP', 'GO', 'HELP', 'OPEN', 'WALK', 'RUN',
+    'PLAY', 'JUMP', 'MILK', 'COOKIE', 'WATER', 'JUICE', 'CEREAL', 'BOOK', 'BALL',
+    'BUBBLES', 'SHOES', 'HOT', 'IN', 'ON', 'UP', 'DOWN', 'PLEASE', 'ME', 'YOU',
+    'HI', 'BYE', 'YES', 'NO', 'BIG', 'LITTLE', 'BED',
+  ],
+  animals: [
+    'BABY', 'COW', 'FISH', 'DUCK', 'CAT', 'DOG', 'TREE', 'SUN',
+  ],
+  fun: [
+    'HOLIDAY', 'BIRTHDAY', 'SUNSHINE', 'RAINBOW', 'BUTTERFLY', 'ELEPHANT',
+    'MOUNTAIN', 'ADVENTURE', 'TREASURE', 'GARDEN', 'OCEAN', 'PLANET', 'ROCKET',
+    'CASTLE', 'DRAGON', 'UNICORN', 'WIZARD', 'FOREST', 'WATERFALL', 'CHAMPION',
+  ],
+};
+
+type WordGroupKey = keyof typeof WORD_GROUPS;
 
 interface LetterState {
   expectedChar: string;
@@ -29,12 +45,46 @@ export default function TypingGame() {
   const [letterStates, setLetterStates] = useState<LetterState[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [enabledGroups, setEnabledGroups] = useState<Record<WordGroupKey, boolean>>({
+    family: true,
+    everyday: true,
+    animals: true,
+    fun: true,
+  });
   const { width, height } = useWindowSize();
   const { speak, isReady: ttsReady, setMode } = usePiperTTS();
 
-  const getRandomWord = useCallback(() => {
-    return WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+  // Load enabled groups from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('typingGameEnabledGroups');
+    if (saved) {
+      setEnabledGroups(JSON.parse(saved));
+    }
   }, []);
+
+  // Save enabled groups to localStorage
+  const toggleGroup = useCallback((groupKey: WordGroupKey) => {
+    setEnabledGroups(prev => {
+      const newGroups = { ...prev, [groupKey]: !prev[groupKey] };
+      localStorage.setItem('typingGameEnabledGroups', JSON.stringify(newGroups));
+      return newGroups;
+    });
+  }, []);
+
+  const getAvailableWords = useCallback(() => {
+    const allWords = Object.entries(WORD_GROUPS)
+      .filter(([key]) => enabledGroups[key as WordGroupKey])
+      .flatMap(([, words]) => words);
+    return allWords;
+  }, [enabledGroups]);
+
+  const getRandomWord = useCallback(() => {
+    const availableWords = getAvailableWords();
+    if (availableWords.length === 0) {
+      return WORD_GROUPS.family[0];
+    }
+    return availableWords[Math.floor(Math.random() * availableWords.length)];
+  }, [getAvailableWords]);
 
   const initializeGame = useCallback(() => {
     const word = getRandomWord();
@@ -186,11 +236,50 @@ export default function TypingGame() {
     return `${Math.max(fontSize, 48)}px`; // Min 48px (80% of 60)
   };
 
+  const settingsContent = (
+    <div className="space-y-6">
+      {/* Voice Selection */}
+      <div>
+        <h4 className="font-semibold mb-2">Voice</h4>
+        <select
+          value={localStorage.getItem('ttsMode') || 'browser'}
+          onChange={(e) => {
+            const newMode = e.target.value as 'browser' | 'piper';
+            localStorage.setItem('ttsMode', newMode);
+            setMode(newMode as any);
+          }}
+          className="select select-bordered w-full"
+        >
+          <option value="browser">Browser Voice (Fast)</option>
+          <option value="piper">Piper Voice (Quality)</option>
+        </select>
+      </div>
+
+      {/* Word Groups */}
+      <div>
+        <h4 className="font-semibold mb-2">Word Groups</h4>
+        <div className="space-y-2">
+          {(Object.keys(WORD_GROUPS) as WordGroupKey[]).map((groupKey) => (
+            <div key={groupKey} className="form-control">
+              <label className="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={enabledGroups[groupKey]}
+                  onChange={() => toggleGroup(groupKey)}
+                />
+                <span className="label-text capitalize">{groupKey}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <GameLayout onModeChange={setMode}>
-      <Link href="/" className="absolute top-4 left-4 btn btn-ghost btn-sm">
-        ← Back
-      </Link>
+      <GameHeader showBackButton={true} settingsContent={settingsContent} />
 
       <Celebration show={showConfetti} />
 

@@ -7,9 +7,10 @@ import Celebration from './Celebration';
 import TextInput from './TextInput';
 import QuestionDisplay from './QuestionDisplay';
 import GameLayout from './GameLayout';
-import Link from 'next/link';
+import GameHeader from './GameHeader';
 
-const ANIMALS = [
+const EMOJI_SETS = {
+  animals: [
   { emoji: '🐶', name: 'DOG' },
   { emoji: '🐱', name: 'CAT' },
   { emoji: '🐭', name: 'MOUSE' },
@@ -92,7 +93,82 @@ const ANIMALS = [
   { emoji: '🐀', name: 'RAT' },
   { emoji: '🐿️', name: 'SQUIRREL' },
   { emoji: '🦔', name: 'HEDGEHOG' },
-];
+  ],
+  foods: [
+    { emoji: '🍎', name: 'APPLE' },
+    { emoji: '🍌', name: 'BANANA' },
+    { emoji: '🍊', name: 'ORANGE' },
+    { emoji: '🍇', name: 'GRAPES' },
+    { emoji: '🍓', name: 'STRAWBERRY' },
+    { emoji: '🍉', name: 'WATERMELON' },
+    { emoji: '🍑', name: 'PEACH' },
+    { emoji: '🍒', name: 'CHERRY' },
+    { emoji: '🥝', name: 'KIWI' },
+    { emoji: '🍍', name: 'PINEAPPLE' },
+    { emoji: '🥭', name: 'MANGO' },
+    { emoji: '🍕', name: 'PIZZA' },
+    { emoji: '🍔', name: 'BURGER' },
+    { emoji: '🌭', name: 'HOTDOG' },
+    { emoji: '🥪', name: 'SANDWICH' },
+    { emoji: '🌮', name: 'TACO' },
+    { emoji: '🍝', name: 'SPAGHETTI' },
+    { emoji: '🍜', name: 'NOODLES' },
+    { emoji: '🍚', name: 'RICE' },
+    { emoji: '🍞', name: 'BREAD' },
+    { emoji: '🧀', name: 'CHEESE' },
+    { emoji: '🥚', name: 'EGG' },
+    { emoji: '🥛', name: 'MILK' },
+    { emoji: '🍪', name: 'COOKIE' },
+    { emoji: '🎂', name: 'CAKE' },
+    { emoji: '🍩', name: 'DONUT' },
+    { emoji: '🍦', name: 'ICECREAM' },
+    { emoji: '🍫', name: 'CHOCOLATE' },
+  ],
+  vehicles: [
+    { emoji: '🚗', name: 'CAR' },
+    { emoji: '🚕', name: 'TAXI' },
+    { emoji: '🚙', name: 'VAN' },
+    { emoji: '🚌', name: 'BUS' },
+    { emoji: '🚎', name: 'TROLLEYBUS' },
+    { emoji: '🚐', name: 'MINIBUS' },
+    { emoji: '🚑', name: 'AMBULANCE' },
+    { emoji: '🚒', name: 'FIRETRUCK' },
+    { emoji: '🚓', name: 'POLICE' },
+    { emoji: '🚔', name: 'POLICE' },
+    { emoji: '🚚', name: 'TRUCK' },
+    { emoji: '🚛', name: 'LORRY' },
+    { emoji: '🚜', name: 'TRACTOR' },
+    { emoji: '🏎️', name: 'RACECAR' },
+    { emoji: '🏍️', name: 'MOTORCYCLE' },
+    { emoji: '🛵', name: 'SCOOTER' },
+    { emoji: '🚲', name: 'BICYCLE' },
+    { emoji: '🛴', name: 'SCOOTER' },
+    { emoji: '✈️', name: 'AIRPLANE' },
+    { emoji: '🚁', name: 'HELICOPTER' },
+    { emoji: '🚂', name: 'TRAIN' },
+    { emoji: '🚆', name: 'TRAIN' },
+    { emoji: '🚇', name: 'METRO' },
+    { emoji: '🚈', name: 'TRAIN' },
+    { emoji: '🚊', name: 'TRAM' },
+    { emoji: '🚝', name: 'MONORAIL' },
+    { emoji: '🚞', name: 'RAILWAY' },
+    { emoji: '🚋', name: 'TRAM' },
+    { emoji: '🚃', name: 'TRAIN' },
+    { emoji: '🚟', name: 'RAILWAY' },
+    { emoji: '🚠', name: 'CABLE' },
+    { emoji: '🚡', name: 'AERIAL' },
+    { emoji: '🛶', name: 'CANOE' },
+    { emoji: '⛵', name: 'SAILBOAT' },
+    { emoji: '🚤', name: 'SPEEDBOAT' },
+    { emoji: '🛥️', name: 'MOTORBOAT' },
+    { emoji: '🛳️', name: 'SHIP' },
+    { emoji: '⛴️', name: 'FERRY' },
+    { emoji: '🚢', name: 'SHIP' },
+    { emoji: '🚀', name: 'ROCKET' },
+  ],
+};
+
+type EmojiSetKey = keyof typeof EMOJI_SETS;
 
 interface LetterState {
   expectedChar: string;
@@ -101,51 +177,84 @@ interface LetterState {
 }
 
 export default function StartingLetterGame() {
-  const [currentAnimal, setCurrentAnimal] = useState({ emoji: '', name: '' });
+  const [currentItem, setCurrentItem] = useState({ emoji: '', name: '' });
   const [letterStates, setLetterStates] = useState<LetterState[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [enabledSets, setEnabledSets] = useState<Record<EmojiSetKey, boolean>>({
+    animals: true,
+    foods: true,
+    vehicles: true,
+  });
   const { width, height } = useWindowSize();
   const { speak, isReady: ttsReady, setMode } = usePiperTTS();
 
-  const getRandomAnimal = useCallback(() => {
-    return ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  // Load enabled sets from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('startingLetterEnabledSets');
+    if (saved) {
+      setEnabledSets(JSON.parse(saved));
+    }
   }, []);
 
+  // Save enabled sets to localStorage
+  const toggleSet = useCallback((setKey: EmojiSetKey) => {
+    setEnabledSets(prev => {
+      const newSets = { ...prev, [setKey]: !prev[setKey] };
+      localStorage.setItem('startingLetterEnabledSets', JSON.stringify(newSets));
+      return newSets;
+    });
+  }, []);
+
+  const getAvailableItems = useCallback(() => {
+    const allItems = Object.entries(EMOJI_SETS)
+      .filter(([key]) => enabledSets[key as EmojiSetKey])
+      .flatMap(([, items]) => items);
+    return allItems;
+  }, [enabledSets]);
+
+  const getRandomItem = useCallback(() => {
+    const availableItems = getAvailableItems();
+    if (availableItems.length === 0) {
+      return EMOJI_SETS.animals[0];
+    }
+    return availableItems[Math.floor(Math.random() * availableItems.length)];
+  }, [getAvailableItems]);
+
   const initializeGame = useCallback(() => {
-    const animal = getRandomAnimal();
-    setCurrentAnimal(animal);
+    const item = getRandomItem();
+    setCurrentItem(item);
     setLetterStates([
       {
-        expectedChar: animal.name[0],
+        expectedChar: item.name[0],
         typedChar: '',
         status: 'empty'
       }
     ]);
     setCurrentIndex(0);
     setShowConfetti(false);
-  }, [getRandomAnimal]);
+  }, [getRandomItem]);
 
   useEffect(() => {
     initializeGame();
   }, [initializeGame]);
 
-  // Text-to-speech effect - reads out the animal name when the game initializes
+  // Text-to-speech effect - reads out the item name when the game initializes
   useEffect(() => {
-    if (!currentAnimal.name || !ttsReady) return;
+    if (!currentItem.name || !ttsReady) return;
 
-    const speakAnimal = async () => {
+    const speakItem = async () => {
       try {
-        await speak(currentAnimal.name);
+        await speak(currentItem.name);
       } catch (err) {
-        console.error('Failed to speak animal name:', err);
+        console.error('Failed to speak item name:', err);
       }
     };
 
-    // 1 second delay before saying the animal name
-    const timeoutId = setTimeout(speakAnimal, 1000);
+    // 1 second delay before saying the item name
+    const timeoutId = setTimeout(speakItem, 1000);
     return () => clearTimeout(timeoutId);
-  }, [currentAnimal, ttsReady, speak]);
+  }, [currentItem, ttsReady, speak]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -162,7 +271,7 @@ export default function StartingLetterGame() {
       if (e.key === 'Backspace') {
         e.preventDefault();
         setLetterStates([{
-          expectedChar: currentAnimal.name[0],
+          expectedChar: currentItem.name[0],
           typedChar: '',
           status: 'empty'
         }]);
@@ -173,7 +282,7 @@ export default function StartingLetterGame() {
       // Handle letter input (only if nothing has been entered yet)
       if (currentIndex === 0 && /^[a-zA-Z]$/.test(e.key)) {
         const typedChar = e.key.toUpperCase();
-        const expectedChar = currentAnimal.name[0];
+        const expectedChar = currentItem.name[0];
         const isCorrect = typedChar === expectedChar;
 
         setLetterStates([{
@@ -186,11 +295,11 @@ export default function StartingLetterGame() {
           // Correct answer!
           setShowConfetti(true);
 
-          // Speak the animal name again to celebrate
+          // Speak the item name again to celebrate
           if (ttsReady) {
             setTimeout(async () => {
               try {
-                await speak(currentAnimal.name);
+                await speak(currentItem.name);
               } catch (err) {
                 console.error('Failed to speak celebration:', err);
               }
@@ -204,7 +313,7 @@ export default function StartingLetterGame() {
           // Wrong answer - show red and clear after 1 second
           setTimeout(() => {
             setLetterStates([{
-              expectedChar: currentAnimal.name[0],
+              expectedChar: currentItem.name[0],
               typedChar: '',
               status: 'empty'
             }]);
@@ -217,7 +326,7 @@ export default function StartingLetterGame() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, currentAnimal, initializeGame, speak, ttsReady]);
+  }, [currentIndex, currentItem, initializeGame, speak, ttsReady]);
 
   // Calculate font size for the emoji
   const calculateEmojiFontSize = () => {
@@ -239,16 +348,55 @@ export default function StartingLetterGame() {
     return `${Math.max(fontSize, 60)}px`;
   };
 
+  const settingsContent = (
+    <div className="space-y-6">
+      {/* Voice Selection */}
+      <div>
+        <h4 className="font-semibold mb-2">Voice</h4>
+        <select
+          value={localStorage.getItem('ttsMode') || 'browser'}
+          onChange={(e) => {
+            const newMode = e.target.value as 'browser' | 'piper';
+            localStorage.setItem('ttsMode', newMode);
+            setMode(newMode as any);
+          }}
+          className="select select-bordered w-full"
+        >
+          <option value="browser">Browser Voice (Fast)</option>
+          <option value="piper">Piper Voice (Quality)</option>
+        </select>
+      </div>
+
+      {/* Emoji Sets */}
+      <div>
+        <h4 className="font-semibold mb-2">Emoji Sets</h4>
+        <div className="space-y-2">
+          {(Object.keys(EMOJI_SETS) as EmojiSetKey[]).map((setKey) => (
+            <div key={setKey} className="form-control">
+              <label className="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={enabledSets[setKey]}
+                  onChange={() => toggleSet(setKey)}
+                />
+                <span className="label-text capitalize">{setKey}</span>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <GameLayout onModeChange={setMode}>
-      <Link href="/" className="absolute top-4 left-4 btn btn-ghost btn-sm">
-        ← Back
-      </Link>
+      <GameHeader showBackButton={true} settingsContent={settingsContent} />
 
       <Celebration show={showConfetti} />
 
       <QuestionDisplay
-        content={currentAnimal.emoji}
+        content={currentItem.emoji}
         fontSize={calculateEmojiFontSize()}
       />
 

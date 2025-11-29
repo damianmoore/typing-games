@@ -7,7 +7,7 @@ import Celebration from './Celebration';
 import TextInput from './TextInput';
 import QuestionDisplay from './QuestionDisplay';
 import GameLayout from './GameLayout';
-import Link from 'next/link';
+import GameHeader from './GameHeader';
 
 const EMOJI_LIST = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔'];
 
@@ -173,11 +173,30 @@ export default function CountingGame() {
   // Generate emoji display
   const emojiDisplay = Array(currentCount).fill(currentEmoji).join(' ');
 
+  const settingsContent = (
+    <div className="space-y-6">
+      {/* Voice Selection */}
+      <div>
+        <h4 className="font-semibold mb-2">Voice</h4>
+        <select
+          value={localStorage.getItem('ttsMode') || 'browser'}
+          onChange={(e) => {
+            const newMode = e.target.value as 'browser' | 'piper';
+            localStorage.setItem('ttsMode', newMode);
+            setMode(newMode as any);
+          }}
+          className="select select-bordered w-full"
+        >
+          <option value="browser">Browser Voice (Fast)</option>
+          <option value="piper">Piper Voice (Quality)</option>
+        </select>
+      </div>
+    </div>
+  );
+
   return (
     <GameLayout onModeChange={setMode}>
-      <Link href="/" className="absolute top-4 left-4 btn btn-ghost btn-sm">
-        ← Back
-      </Link>
+      <GameHeader showBackButton={true} settingsContent={settingsContent} />
 
       <Celebration show={showConfetti} />
 
