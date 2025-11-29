@@ -7,6 +7,7 @@ import Celebration from './Celebration';
 import TextInput from './TextInput';
 import QuestionDisplay from './QuestionDisplay';
 import GameLayout from './GameLayout';
+import Link from 'next/link';
 
 const EMOJI_LIST = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔'];
 
@@ -125,7 +126,7 @@ export default function CountingGame() {
 
           setTimeout(() => {
             initializeGame();
-          }, 6000);
+          }, 4000);
         } else {
           // Wrong answer - show red and clear after 1 second
           setShowError(true);
@@ -174,6 +175,10 @@ export default function CountingGame() {
 
   return (
     <GameLayout onModeChange={setMode}>
+      <Link href="/" className="absolute top-4 left-4 btn btn-ghost btn-sm">
+        ← Back
+      </Link>
+
       <Celebration show={showConfetti} />
 
       <QuestionDisplay

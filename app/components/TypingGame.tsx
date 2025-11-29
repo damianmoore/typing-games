@@ -158,7 +158,7 @@ export default function TypingGame() {
 
             setTimeout(() => {
               initializeGame();
-            }, 6000);
+            }, 4000);
           }
         }
 
@@ -188,6 +188,10 @@ export default function TypingGame() {
 
   return (
     <GameLayout onModeChange={setMode}>
+      <Link href="/" className="absolute top-4 left-4 btn btn-ghost btn-sm">
+        ← Back
+      </Link>
+
       <Celebration show={showConfetti} />
 
       <QuestionDisplay
