@@ -8,7 +8,9 @@
       "Bash(npm run dev:*)",
       "Bash(npm uninstall:*)",
       "Bash(npm run build:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(make build-prd:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

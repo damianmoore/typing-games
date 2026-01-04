@@ -9,6 +9,7 @@ export interface PiperTTS {
   isReady: boolean;
   isLoading: boolean;
   error: string | null;
+  mode: TTSMode;
   setMode: (mode: TTSMode) => void;
 }
 
@@ -20,6 +21,15 @@ export function usePiperTTS(): PiperTTS {
   const ttsModuleRef = useRef<any>(null);
   const voiceIdRef = useRef<string>('en_GB-southern_english_female-low');
   const browserVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
+
+  // Load mode from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const savedMode = localStorage.getItem('ttsMode') as TTSMode | null;
+    if (savedMode) {
+      setModeState(savedMode);
+    }
+  }, []);
 
   // Initialize browser speech synthesis
   useEffect(() => {
@@ -160,6 +170,7 @@ export function usePiperTTS(): PiperTTS {
     isReady,
     isLoading,
     error,
+    mode,
     setMode,
   };
 }

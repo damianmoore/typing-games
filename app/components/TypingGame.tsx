@@ -47,7 +47,7 @@ export default function TypingGame() {
   const [customWords, setCustomWords] = useState<string>('');
   const [customWordsEnabled, setCustomWordsEnabled] = useState<boolean>(true);
   const { width, height } = useWindowSize();
-  const { speak, isReady: ttsReady, setMode } = usePiperTTS();
+  const { speak, isReady: ttsReady, mode, setMode } = usePiperTTS();
 
   // Load enabled groups and custom words from localStorage
   useEffect(() => {
@@ -278,11 +278,11 @@ export default function TypingGame() {
       <div>
         <h4 className="font-semibold mb-2">Voice</h4>
         <select
-          value={localStorage.getItem('ttsMode') || 'browser'}
+          value={mode}
           onChange={(e) => {
             const newMode = e.target.value as 'browser' | 'piper';
             localStorage.setItem('ttsMode', newMode);
-            setMode(newMode as any);
+            setMode(newMode);
           }}
           className="select select-bordered w-full"
         >
