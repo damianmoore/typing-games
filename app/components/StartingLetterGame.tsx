@@ -11,160 +11,177 @@ import GameHeader from './GameHeader';
 
 const EMOJI_SETS = {
   animals: [
-  { emoji: '🐶', name: 'DOG' },
-  { emoji: '🐱', name: 'CAT' },
-  { emoji: '🐭', name: 'MOUSE' },
-  { emoji: '🐹', name: 'HAMSTER' },
-  { emoji: '🐰', name: 'RABBIT' },
-  { emoji: '🦊', name: 'FOX' },
-  { emoji: '🐻', name: 'IVYR' },
-  { emoji: '🐼', name: 'PANDA' },
-  { emoji: '🐨', name: 'KOALA' },
-  { emoji: '🐯', name: 'TIGER' },
-  { emoji: '🦁', name: 'LION' },
-  { emoji: '🐮', name: 'COW' },
-  { emoji: '🐷', name: 'PIG' },
-  { emoji: '🐸', name: 'FROG' },
-  { emoji: '🐵', name: 'MONKEY' },
-  { emoji: '🐔', name: 'CHICKEN' },
-  { emoji: '🐧', name: 'PENGUIN' },
-  { emoji: '🐦', name: 'BIRD' },
-  { emoji: '🐤', name: 'CHICK' },
-  { emoji: '🦆', name: 'DUCK' },
-  { emoji: '🦅', name: 'EAGLE' },
-  { emoji: '🦉', name: 'OWL' },
-  { emoji: '🐺', name: 'WOLF' },
-  { emoji: '🐴', name: 'HORSE' },
-  { emoji: '🦄', name: 'UNICORN' },
-  { emoji: '🐝', name: 'BEE' },
-  { emoji: '🦋', name: 'BUTTERFLY' },
-  { emoji: '🐌', name: 'SNAIL' },
-  { emoji: '🐞', name: 'LADYBUG' },
-  { emoji: '🐢', name: 'TURTLE' },
-  { emoji: '🐍', name: 'SNAKE' },
-  { emoji: '🦎', name: 'LIZARD' },
-  { emoji: '🦖', name: 'DINOSAUR' },
-  { emoji: '🐙', name: 'OCTOPUS' },
-  { emoji: '🦐', name: 'SHRIMP' },
-  { emoji: '🦀', name: 'CRAB' },
-  { emoji: '🐡', name: 'PUFFERFISH' },
-  { emoji: '🐠', name: 'FISH' },
-  { emoji: '🐟', name: 'FISH' },
-  { emoji: '🐬', name: 'DOLPHIN' },
-  { emoji: '🐳', name: 'WHALE' },
-  { emoji: '🐋', name: 'WHALE' },
-  { emoji: '🦈', name: 'SHARK' },
-  { emoji: '🐊', name: 'CROCODILE' },
-  { emoji: '🐅', name: 'TIGER' },
-  { emoji: '🐆', name: 'LEOPARD' },
-  { emoji: '🦓', name: 'ZEBRA' },
-  { emoji: '🦍', name: 'GORILLA' },
-  { emoji: '🐘', name: 'ELEPHANT' },
-  { emoji: '🦛', name: 'HIPPO' },
-  { emoji: '🦏', name: 'RHINO' },
-  { emoji: '🐪', name: 'CAMEL' },
-  { emoji: '🐫', name: 'CAMEL' },
-  { emoji: '🦒', name: 'GIRAFFE' },
-  { emoji: '🦘', name: 'KANGAROO' },
-  { emoji: '🐄', name: 'COW' },
-  { emoji: '🐎', name: 'HORSE' },
-  { emoji: '🐖', name: 'PIG' },
-  { emoji: '🐏', name: 'RAM' },
-  { emoji: '🐑', name: 'SHEEP' },
-  { emoji: '🦙', name: 'LLAMA' },
-  { emoji: '🐐', name: 'GOAT' },
-  { emoji: '🦌', name: 'DEER' },
-  { emoji: '🐕', name: 'DOG' },
-  { emoji: '🐩', name: 'POODLE' },
-  { emoji: '🐈', name: 'CAT' },
-  { emoji: '🐓', name: 'ROOSTER' },
-  { emoji: '🦃', name: 'TURKEY' },
-  { emoji: '🦚', name: 'PEACOCK' },
-  { emoji: '🦜', name: 'PARROT' },
-  { emoji: '🦢', name: 'SWAN' },
-  { emoji: '🦩', name: 'FLAMINGO' },
-  { emoji: '🐇', name: 'RABBIT' },
-  { emoji: '🦝', name: 'RACCOON' },
-  { emoji: '🦨', name: 'SKUNK' },
-  { emoji: '🦡', name: 'BADGER' },
-  { emoji: '🦦', name: 'OTTER' },
-  { emoji: '🦥', name: 'SLOTH' },
-  { emoji: '🐁', name: 'MOUSE' },
-  { emoji: '🐀', name: 'RAT' },
-  { emoji: '🐿️', name: 'SQUIRREL' },
-  { emoji: '🦔', name: 'HEDGEHOG' },
+    { emoji: '🐜', name: 'ANT' },
+    { emoji: '🦡', name: 'BADGER' },
+    { emoji: '🐝', name: 'BEE' },
+    { emoji: '🐦', name: 'BIRD' },
+    { emoji: '🦬', name: 'BISON' },
+    { emoji: '🦋', name: 'BUTTERFLY' },
+    { emoji: '🐪', name: 'CAMEL' },
+    { emoji: '🐱', name: 'CAT' },
+    { emoji: '🐤', name: 'CHICK' },
+    { emoji: '🐔', name: 'CHICKEN' },
+    { emoji: '🐮', name: 'COW' },
+    { emoji: '🦀', name: 'CRAB' },
+    { emoji: '🐊', name: 'CROCODILE' },
+    { emoji: '🦌', name: 'DEER' },
+    { emoji: '🦖', name: 'DINOSAUR' },
+    { emoji: '🐶', name: 'DOG' },
+    { emoji: '🐬', name: 'DOLPHIN' },
+    { emoji: '🦆', name: 'DUCK' },
+    { emoji: '🦅', name: 'EAGLE' },
+    { emoji: '🐘', name: 'ELEPHANT' },
+    { emoji: '🐠', name: 'FISH' },
+    { emoji: '🦩', name: 'FLAMINGO' },
+    { emoji: '🦊', name: 'FOX' },
+    { emoji: '🐸', name: 'FROG' },
+    { emoji: '🦒', name: 'GIRAFFE' },
+    { emoji: '🐐', name: 'GOAT' },
+    { emoji: '🦍', name: 'GORILLA' },
+    { emoji: '🐹', name: 'HAMSTER' },
+    { emoji: '🦔', name: 'HEDGEHOG' },
+    { emoji: '🦛', name: 'HIPPO' },
+    { emoji: '🐴', name: 'HORSE' },
+    { emoji: '🦎', name: 'IGUANA' },
+    { emoji: '🪼', name: 'JELLYFISH' },
+    { emoji: '🦘', name: 'KANGAROO' },
+    { emoji: '🐨', name: 'KOALA' },
+    { emoji: '🐞', name: 'LADYBIRD' },
+    { emoji: '🐆', name: 'LEOPARD' },
+    { emoji: '🦁', name: 'LION' },
+    { emoji: '🦎', name: 'LIZARD' },
+    { emoji: '🦙', name: 'LLAMA' },
+    { emoji: '🐵', name: 'MONKEY' },
+    { emoji: '🐭', name: 'MOUSE' },
+    { emoji: '🐙', name: 'OCTOPUS' },
+    { emoji: '🦦', name: 'OTTER' },
+    { emoji: '🦉', name: 'OWL' },
+    { emoji: '🐼', name: 'PANDA' },
+    { emoji: '🦜', name: 'PARROT' },
+    { emoji: '🦚', name: 'PEACOCK' },
+    { emoji: '🐧', name: 'PENGUIN' },
+    { emoji: '🐷', name: 'PIG' },
+    { emoji: '🐩', name: 'POODLE' },
+    { emoji: '🐡', name: 'PUFFERFISH' },
+    { emoji: '🐰', name: 'RABBIT' },
+    { emoji: '🦝', name: 'RACCOON' },
+    { emoji: '🐏', name: 'RAM' },
+    { emoji: '🐀', name: 'RAT' },
+    { emoji: '🦏', name: 'RHINO' },
+    { emoji: '🐓', name: 'ROOSTER' },
+    { emoji: '🦂', name: 'SCORPION' },
+    { emoji: '🦈', name: 'SHARK' },
+    { emoji: '🐑', name: 'SHEEP' },
+    { emoji: '🦐', name: 'SHRIMP' },
+    { emoji: '🦨', name: 'SKUNK' },
+    { emoji: '🦥', name: 'SLOTH' },
+    { emoji: '🐌', name: 'SNAIL' },
+    { emoji: '🐍', name: 'SNAKE' },
+    { emoji: '🐿️', name: 'SQUIRREL' },
+    { emoji: '🦢', name: 'SWAN' },
+    { emoji: '🐯', name: 'TIGER' },
+    { emoji: '🦃', name: 'TURKEY' },
+    { emoji: '🐢', name: 'TURTLE' },
+    { emoji: '🦄', name: 'UNICORN' },
+    { emoji: '🐳', name: 'WHALE' },
+    { emoji: '🐺', name: 'WOLF' },
+    { emoji: '🪱', name: 'WORM' },
+    { emoji: '🐃', name: 'YAK' },
+    { emoji: '🦓', name: 'ZEBRA' },
   ],
   foods: [
     { emoji: '🍎', name: 'APPLE' },
-    { emoji: '🍌', name: 'BANANA' },
-    { emoji: '🍊', name: 'ORANGE' },
-    { emoji: '🍇', name: 'GRAPES' },
-    { emoji: '🍓', name: 'STRAWBERRY' },
-    { emoji: '🍉', name: 'WATERMELON' },
-    { emoji: '🍑', name: 'PEACH' },
-    { emoji: '🍒', name: 'CHERRY' },
-    { emoji: '🥝', name: 'KIWI' },
-    { emoji: '🍍', name: 'PINEAPPLE' },
-    { emoji: '🥭', name: 'MANGO' },
-    { emoji: '🍕', name: 'PIZZA' },
-    { emoji: '🍔', name: 'BURGER' },
-    { emoji: '🌭', name: 'HOTDOG' },
-    { emoji: '🥪', name: 'SANDWICH' },
-    { emoji: '🌮', name: 'TACO' },
-    { emoji: '🍝', name: 'SPAGHETTI' },
-    { emoji: '🍜', name: 'NOODLES' },
-    { emoji: '🍚', name: 'RICE' },
+    { emoji: '🍆', name: 'AUBERGINE' },
+    { emoji: '🥯', name: 'BAGEL' },
+    { emoji: '🫐', name: 'BLUEBERRY' },
     { emoji: '🍞', name: 'BREAD' },
-    { emoji: '🧀', name: 'CHEESE' },
-    { emoji: '🥚', name: 'EGG' },
-    { emoji: '🥛', name: 'MILK' },
-    { emoji: '🍪', name: 'COOKIE' },
+    { emoji: '🥦', name: 'BROCCOLI' },
+    { emoji: '🍔', name: 'BURGER' },
+    { emoji: '🌯', name: 'BURRITO' },
+    { emoji: '🧈', name: 'BUTTER' },
     { emoji: '🎂', name: 'CAKE' },
-    { emoji: '🍩', name: 'DONUT' },
-    { emoji: '🍦', name: 'ICECREAM' },
+    { emoji: '🥕', name: 'CARROT' },
+    { emoji: '🧀', name: 'CHEESE' },
+    { emoji: '🍒', name: 'CHERRY' },
+    { emoji: '🌶️', name: 'CHILLI' },
     { emoji: '🍫', name: 'CHOCOLATE' },
+    { emoji: '🥥', name: 'COCONUT' },
+    { emoji: '🍪', name: 'COOKIE' },
+    { emoji: '🥐', name: 'CROISSANT' },
+    { emoji: '🥒', name: 'CUCUMBER' },
+    { emoji: '🍩', name: 'DONUT' },
+    { emoji: '🧄', name: 'GARLIC' },
+    { emoji: '🍇', name: 'GRAPES' },
+    { emoji: '🌭', name: 'HOTDOG' },
+    { emoji: '🍦', name: 'ICECREAM' },
+    { emoji: '🧃', name: 'JUICE' },
+    { emoji: '🥝', name: 'KIWI' },
+    { emoji: '🍋', name: 'LEMON' },
+    { emoji: '🥬', name: 'LETTUCE' },
+    { emoji: '🥭', name: 'MANGO' },
+    { emoji: '🍈', name: 'MELON' },
+    { emoji: '🥛', name: 'MILK' },
+    { emoji: '🍄', name: 'MUSHROOM' },
+    { emoji: '🍜', name: 'NOODLES' },
+    { emoji: '🥜', name: 'NUT' },
+    { emoji: '🫒', name: 'OLIVE' },
+    { emoji: '🧅', name: 'ONION' },
+    { emoji: '🍊', name: 'ORANGE' },
+    { emoji: '🥞', name: 'PANCAKE' },
+    { emoji: '🍑', name: 'PEACH' },
+    { emoji: '🍐', name: 'PEAR' },
+    { emoji: '🫛', name: 'PEAS' },
+    { emoji: '🫑', name: 'PEPPER' },
+    { emoji: '🥧', name: 'PIE' },
+    { emoji: '🍍', name: 'PINEAPPLE' },
+    { emoji: '🍕', name: 'PIZZA' },
+    { emoji: '🍿', name: 'POPCORN' },
+    { emoji: '🥔', name: 'POTATO' },
+    { emoji: '🥨', name: 'PRETZEL' },
+    { emoji: '🍚', name: 'RICE' },
+    { emoji: '🥪', name: 'SANDWICH' },
+    { emoji: '🍲', name: 'SOUP' },
+    { emoji: '🍝', name: 'SPAGHETTI' },
+    { emoji: '🍓', name: 'STRAWBERRY' },
+    { emoji: '🌽', name: 'SWEETCORN' },
+    { emoji: '🌮', name: 'TACO' },
+    { emoji: '🧇', name: 'WAFFLE' },
+    { emoji: '🍉', name: 'WATERMELON' },
   ],
-  vehicles: [
-    { emoji: '🚗', name: 'CAR' },
-    { emoji: '🚕', name: 'TAXI' },
-    { emoji: '🚙', name: 'VAN' },
-    { emoji: '🚌', name: 'BUS' },
-    { emoji: '🚎', name: 'TROLLEYBUS' },
-    { emoji: '🚐', name: 'MINIBUS' },
+  transport: [
+    { emoji: '✈️', name: 'AEROPLANE' },
     { emoji: '🚑', name: 'AMBULANCE' },
-    { emoji: '🚒', name: 'FIRETRUCK' },
-    { emoji: '🚓', name: 'POLICE' },
-    { emoji: '🚔', name: 'POLICE' },
-    { emoji: '🚚', name: 'TRUCK' },
-    { emoji: '🚛', name: 'LORRY' },
-    { emoji: '🚜', name: 'TRACTOR' },
-    { emoji: '🏎️', name: 'RACECAR' },
-    { emoji: '🏍️', name: 'MOTORCYCLE' },
-    { emoji: '🛵', name: 'SCOOTER' },
+    { emoji: '🚧', name: 'BARRIER' },
     { emoji: '🚲', name: 'BICYCLE' },
-    { emoji: '🛴', name: 'SCOOTER' },
-    { emoji: '✈️', name: 'AIRPLANE' },
-    { emoji: '🚁', name: 'HELICOPTER' },
-    { emoji: '🚂', name: 'TRAIN' },
-    { emoji: '🚆', name: 'TRAIN' },
-    { emoji: '🚇', name: 'METRO' },
-    { emoji: '🚈', name: 'TRAIN' },
-    { emoji: '🚊', name: 'TRAM' },
-    { emoji: '🚝', name: 'MONORAIL' },
-    { emoji: '🚞', name: 'RAILWAY' },
-    { emoji: '🚋', name: 'TRAM' },
-    { emoji: '🚃', name: 'TRAIN' },
-    { emoji: '🚟', name: 'RAILWAY' },
-    { emoji: '🚠', name: 'CABLE' },
-    { emoji: '🚡', name: 'AERIAL' },
+    { emoji: '🚌', name: 'BUS' },
+    { emoji: '🚠', name: 'CABLE CAR' },
     { emoji: '🛶', name: 'CANOE' },
-    { emoji: '⛵', name: 'SAILBOAT' },
-    { emoji: '🚤', name: 'SPEEDBOAT' },
-    { emoji: '🛥️', name: 'MOTORBOAT' },
-    { emoji: '🛳️', name: 'SHIP' },
+    { emoji: '🚗', name: 'CAR' },
+    { emoji: '🚴', name: 'CYCLIST' },
+    { emoji: '🚜', name: 'DIGGER' },
     { emoji: '⛴️', name: 'FERRY' },
-    { emoji: '🚢', name: 'SHIP' },
+    { emoji: '🚒', name: 'FIRE ENGINE' },
+    { emoji: '🚁', name: 'HELICOPTER' },
+    { emoji: '🛬', name: 'JET' },
+    { emoji: '🚛', name: 'LORRY' },
+    { emoji: '🏍️', name: 'MOTOR BIKE' },
+    { emoji: '🪂', name: 'PARACHUTE' },
+    { emoji: '🚓', name: 'POLICE CAR' },
+    { emoji: '🏎️', name: 'RACE CAR' },
     { emoji: '🚀', name: 'ROCKET' },
+    { emoji: '⛵', name: 'SAILBOAT' },
+    { emoji: '🛵', name: 'SCOOTER' },
+    { emoji: '🛳️', name: 'SHIP' },
+    { emoji: '🛷', name: 'SLEDGE' },
+    { emoji: '🚤', name: 'SPEEDBOAT' },
+    { emoji: '🚕', name: 'TAXI' },
+    { emoji: '🚜', name: 'TRACTOR' },
+    { emoji: '🚈', name: 'TRAIN' },
+    { emoji: '🚋', name: 'TRAM' },
+    { emoji: '🚚', name: 'TRUCK' },
+    { emoji: '🛸', name: 'UFO' },
+    { emoji: '🚐', name: 'VAN' },
+    { emoji: '🛞', name: 'WHEEL' },
   ],
 };
 
@@ -184,7 +201,7 @@ export default function StartingLetterGame() {
   const [enabledSets, setEnabledSets] = useState<Record<EmojiSetKey, boolean>>({
     animals: true,
     foods: true,
-    vehicles: true,
+    transport: true,
   });
   const { width, height } = useWindowSize();
   const { speak, isReady: ttsReady, mode, setMode } = usePiperTTS();
@@ -213,16 +230,22 @@ export default function StartingLetterGame() {
     return allItems;
   }, [enabledSets]);
 
-  const getRandomItem = useCallback(() => {
+  const getRandomItem = useCallback((previousStartingLetter?: string) => {
     const availableItems = getAvailableItems();
     if (availableItems.length === 0) {
       return EMOJI_SETS.animals[0];
     }
-    return availableItems[Math.floor(Math.random() * availableItems.length)];
+    // Filter out items with the same starting letter to avoid repetition
+    const filteredItems = previousStartingLetter && availableItems.length > 1
+      ? availableItems.filter(item => item.name[0] !== previousStartingLetter)
+      : availableItems;
+    // Fall back to all items if filtering removed everything
+    const itemsToChooseFrom = filteredItems.length > 0 ? filteredItems : availableItems;
+    return itemsToChooseFrom[Math.floor(Math.random() * itemsToChooseFrom.length)];
   }, [getAvailableItems]);
 
-  const initializeGame = useCallback(() => {
-    const item = getRandomItem();
+  const initializeGame = useCallback((previousStartingLetter?: string) => {
+    const item = getRandomItem(previousStartingLetter);
     setCurrentItem(item);
     setLetterStates([
       {
@@ -261,7 +284,7 @@ export default function StartingLetterGame() {
       // Handle space key to move to next challenge
       if (e.key === ' ') {
         e.preventDefault();
-        initializeGame();
+        initializeGame(currentItem.name[0]);
         return;
       }
 
@@ -295,19 +318,8 @@ export default function StartingLetterGame() {
           // Correct answer!
           setShowConfetti(true);
 
-          // Speak the item name again to celebrate
-          if (ttsReady) {
-            setTimeout(async () => {
-              try {
-                await speak(currentItem.name);
-              } catch (err) {
-                console.error('Failed to speak celebration:', err);
-              }
-            }, 500);
-          }
-
           setTimeout(() => {
-            initializeGame();
+            initializeGame(currentItem.name[0]);
           }, 4000);
         } else {
           // Wrong answer - show red and clear after 1 second
@@ -367,9 +379,9 @@ export default function StartingLetterGame() {
         </select>
       </div>
 
-      {/* Emoji Sets */}
+      {/* Word Groups */}
       <div>
-        <h4 className="font-semibold mb-2">Emoji Sets</h4>
+        <h4 className="font-semibold mb-2">Word Groups</h4>
         <div className="space-y-2">
           {(Object.keys(EMOJI_SETS) as EmojiSetKey[]).map((setKey) => (
             <div key={setKey} className="form-control">

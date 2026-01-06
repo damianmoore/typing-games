@@ -31,12 +31,19 @@ export default function CountingGame() {
     return EMOJI_LIST[Math.floor(Math.random() * EMOJI_LIST.length)];
   }, []);
 
-  const getRandomCount = useCallback(() => {
-    return Math.floor(Math.random() * 9) + 1; // 1-9
+  const getRandomCount = useCallback((previousCount?: number) => {
+    const count = Math.floor(Math.random() * 9) + 1; // 1-9
+    // If we got the same count and there are other options, try again
+    if (previousCount !== undefined && count === previousCount) {
+      // Generate a different count by picking from remaining options
+      const options = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => n !== previousCount);
+      return options[Math.floor(Math.random() * options.length)];
+    }
+    return count;
   }, []);
 
-  const initializeGame = useCallback(() => {
-    const count = getRandomCount();
+  const initializeGame = useCallback((previousCount?: number) => {
+    const count = getRandomCount(previousCount);
     const emoji = getRandomEmoji();
     setCurrentCount(count);
     setCurrentEmoji(emoji);
@@ -78,7 +85,7 @@ export default function CountingGame() {
       // Handle space key to move to next challenge
       if (e.key === ' ') {
         e.preventDefault();
-        initializeGame();
+        initializeGame(currentCount);
         return;
       }
 
@@ -113,19 +120,8 @@ export default function CountingGame() {
           // Correct answer!
           setShowConfetti(true);
 
-          // Speak the count again to celebrate
-          if (ttsReady) {
-            setTimeout(async () => {
-              try {
-                await speak(currentCount.toString());
-              } catch (err) {
-                console.error('Failed to speak celebration:', err);
-              }
-            }, 500);
-          }
-
           setTimeout(() => {
-            initializeGame();
+            initializeGame(currentCount);
           }, 4000);
         } else {
           // Wrong answer - show red and clear after 1 second

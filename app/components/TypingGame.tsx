@@ -108,16 +108,20 @@ export default function TypingGame() {
     return allWords;
   }, [enabledGroups, customWords, customWordsEnabled]);
 
-  const getRandomWord = useCallback(() => {
+  const getRandomWord = useCallback((previousWord?: string) => {
     const availableWords = getAvailableWords();
     if (availableWords.length === 0) {
       return WORD_GROUPS.everyday[0];
     }
-    return availableWords[Math.floor(Math.random() * availableWords.length)];
+    // Filter out the previous word to avoid repetition
+    const filteredWords = previousWord && availableWords.length > 1
+      ? availableWords.filter(word => word !== previousWord)
+      : availableWords;
+    return filteredWords[Math.floor(Math.random() * filteredWords.length)];
   }, [getAvailableWords]);
 
-  const initializeGame = useCallback(() => {
-    const word = getRandomWord();
+  const initializeGame = useCallback((previousWord?: string) => {
+    const word = getRandomWord(previousWord);
     setCurrentWord(word);
     setLetterStates(
       word.split('').map((char: string) => ({
@@ -181,7 +185,7 @@ export default function TypingGame() {
       // Handle space key to move to next word
       if (e.key === ' ') {
         e.preventDefault();
-        initializeGame();
+        initializeGame(currentWord);
         return;
       }
 
@@ -243,7 +247,7 @@ export default function TypingGame() {
             }
 
             setTimeout(() => {
-              initializeGame();
+              initializeGame(currentWord);
             }, 4000);
           }
         }
