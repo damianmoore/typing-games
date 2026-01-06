@@ -5,7 +5,7 @@ import type { SupertonicEngine, VoiceStyle } from '../lib/supertonic';
 
 export type TTSMode = 'browser' | 'piper' | 'supertonic';
 
-export interface PiperTTS {
+export interface TTSEngine {
   speak: (text: string) => Promise<void>;
   isReady: boolean;
   isLoading: boolean;
@@ -15,17 +15,63 @@ export interface PiperTTS {
   loadingStage?: string;
 }
 
-export function usePiperTTS(): PiperTTS {
-  const [isReady, setIsReady] = useState(false);
+export function useTTSEngine(): TTSEngine {
+  const [browserReady, setBrowserReady] = useState(false);
+  const [piperReady, setPiperReady] = useState(false);
+  const [supertonicReady, setSupertonicReady] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setModeState] = useState<TTSMode>('browser');
   const [loadingStage, setLoadingStage] = useState<string | undefined>();
-  const ttsModuleRef = useRef<any>(null);
-  const voiceIdRef = useRef<string>('en_GB-southern_english_female-low');
+  const piperModuleRef = useRef<any>(null);
+  const piperVoiceIdRef = useRef<string>('en_GB-southern_english_female-low');
   const browserVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const supertonicRef = useRef<SupertonicEngine | null>(null);
   const supertonicStyleRef = useRef<VoiceStyle | null>(null);
+
+  // Compute isReady based on current mode AND audio being unlocked
+  const modeReady = mode === 'browser' ? browserReady :
+                    mode === 'piper' ? piperReady :
+                    mode === 'supertonic' ? supertonicReady : false;
+  const isReady = modeReady && audioUnlocked;
+
+  // Unlock audio on first user interaction
+  useEffect(() => {
+    if (typeof window === 'undefined' || audioUnlocked) return;
+
+    const unlockAudio = () => {
+      // Create and play a silent audio context to unlock audio
+      const audioContext = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const buffer = audioContext.createBuffer(1, 1, 22050);
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start(0);
+
+      // Also play a silent HTML audio to unlock that path
+      const silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+      silentAudio.play().catch(() => {});
+
+      setAudioUnlocked(true);
+      console.log('Audio unlocked via user interaction');
+
+      // Remove listeners after unlocking
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+    document.addEventListener('touchstart', unlockAudio);
+
+    return () => {
+      document.removeEventListener('click', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+  }, [audioUnlocked]);
 
   // Load mode from localStorage on mount
   useEffect(() => {
@@ -57,7 +103,7 @@ export function usePiperTTS(): PiperTTS {
     }
 
     // Browser TTS is always ready
-    setIsReady(true);
+    setBrowserReady(true);
 
     return () => {
       if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -68,11 +114,11 @@ export function usePiperTTS(): PiperTTS {
 
   // Initialize Piper TTS only when needed
   useEffect(() => {
-    if (typeof window === 'undefined' || mode !== 'piper' || ttsModuleRef.current) return;
+    if (typeof window === 'undefined' || mode !== 'piper' || piperModuleRef.current) return;
 
     let mounted = true;
 
-    const initVitsTTS = async () => {
+    const initPiper = async () => {
       try {
         setIsLoading(true);
 
@@ -81,7 +127,7 @@ export function usePiperTTS(): PiperTTS {
 
         if (!mounted) return;
 
-        ttsModuleRef.current = tts;
+        piperModuleRef.current = tts;
 
         // Check available voices
         const availableVoices = await tts.voices();
@@ -94,12 +140,13 @@ export function usePiperTTS(): PiperTTS {
                               voiceKeys.find(key => key.startsWith('en_'));
 
         if (preferredVoice) {
-          voiceIdRef.current = preferredVoice;
+          piperVoiceIdRef.current = preferredVoice;
           console.log('Using Piper voice:', preferredVoice);
         }
 
         if (!mounted) return;
 
+        setPiperReady(true);
         setIsLoading(false);
       } catch (err) {
         if (!mounted) return;
@@ -109,7 +156,7 @@ export function usePiperTTS(): PiperTTS {
       }
     };
 
-    initVitsTTS();
+    initPiper();
 
     return () => {
       mounted = false;
@@ -153,6 +200,7 @@ export function usePiperTTS(): PiperTTS {
         engine.setDefaultStyle(style);
 
         console.log('Supertonic TTS initialized');
+        setSupertonicReady(true);
         setLoadingStage(undefined);
         setIsLoading(false);
       } catch (err) {
@@ -202,14 +250,14 @@ export function usePiperTTS(): PiperTTS {
         }
       } else if (mode === 'piper') {
         // Use Piper TTS
-        if (!ttsModuleRef.current) {
+        if (!piperModuleRef.current) {
           console.warn('Piper TTS not loaded yet');
           return;
         }
 
-        const wav = await ttsModuleRef.current.predict({
+        const wav = await piperModuleRef.current.predict({
           text: normalizedText,
-          voiceId: voiceIdRef.current,
+          voiceId: piperVoiceIdRef.current,
         });
 
         // Create audio from WAV blob
@@ -231,7 +279,7 @@ export function usePiperTTS(): PiperTTS {
         const wav = await supertonicRef.current.synthesize(normalizedText, {
           lang: 'en',
           speed: 1.0,
-          totalStep: 5,
+          totalStep: 16,
         });
 
         // Create audio from WAV blob

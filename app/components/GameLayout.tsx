@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { TTSMode } from '../hooks/usePiperTTS';
+import { TTSMode } from '../contexts/TTSContext';
 
 interface GameLayoutProps {
   children: ReactNode;

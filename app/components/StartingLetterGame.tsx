@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import useWindowSize from '../hooks/useWindowSize';
-import { usePiperTTS } from '../hooks/usePiperTTS';
+import { useTTS } from '../contexts/TTSContext';
 import Celebration from './Celebration';
 import TextInput from './TextInput';
 import QuestionDisplay from './QuestionDisplay';
@@ -204,7 +204,7 @@ export default function StartingLetterGame() {
     transport: true,
   });
   const { width, height } = useWindowSize();
-  const { speak, isReady: ttsReady, mode, setMode } = usePiperTTS();
+  const { speak, isReady: ttsReady, mode, setMode } = useTTS();
 
   // Load enabled sets from localStorage
   useEffect(() => {

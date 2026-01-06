@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import useWindowSize from '../hooks/useWindowSize';
-import { usePiperTTS } from '../hooks/usePiperTTS';
+import { useTTS } from '../contexts/TTSContext';
 import Celebration from './Celebration';
 import TextInput from './TextInput';
 import QuestionDisplay from './QuestionDisplay';
@@ -31,7 +31,7 @@ export default function CountingGame() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showError, setShowError] = useState(false);
   const { width, height } = useWindowSize();
-  const { speak, isReady: ttsReady, mode, setMode } = usePiperTTS();
+  const { speak, isReady: ttsReady, mode, setMode } = useTTS();
 
   const getRandomEmoji = useCallback(() => {
     return EMOJI_LIST[Math.floor(Math.random() * EMOJI_LIST.length)];
@@ -75,8 +75,8 @@ export default function CountingGame() {
 
     const speakCount = async () => {
       try {
-        // Convert digit to written word for better pronunciation across all TTS engines
-        const textToSpeak = digitToWord(currentCount);
+        // Convert digit to written word with pauses for better pronunciation - mainly for Supertonic
+        const textToSpeak = `...${digitToWord(currentCount)}...`;
         await speak(textToSpeak);
       } catch (err) {
         console.error('Failed to speak count:', err);
