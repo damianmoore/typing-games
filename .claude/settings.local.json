@@ -10,7 +10,10 @@
       "Bash(npm run build:*)",
       "Bash(pkill:*)",
       "Bash(make build-prd:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(curl:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

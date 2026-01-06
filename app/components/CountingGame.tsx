@@ -11,6 +11,12 @@ import GameHeader from './GameHeader';
 
 const EMOJI_LIST = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊️', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿️', '🦔'];
 
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+
+function digitToWord(digit: number): string {
+  return NUMBER_WORDS[digit] || digit.toString();
+}
+
 interface LetterState {
   expectedChar: string;
   typedChar: string;
@@ -69,7 +75,9 @@ export default function CountingGame() {
 
     const speakCount = async () => {
       try {
-        await speak(currentCount.toString());
+        // Convert digit to written word for better pronunciation across all TTS engines
+        const textToSpeak = digitToWord(currentCount);
+        await speak(textToSpeak);
       } catch (err) {
         console.error('Failed to speak count:', err);
       }
@@ -177,7 +185,7 @@ export default function CountingGame() {
         <select
           value={mode}
           onChange={(e) => {
-            const newMode = e.target.value as 'browser' | 'piper';
+            const newMode = e.target.value as 'browser' | 'piper' | 'supertonic';
             localStorage.setItem('ttsMode', newMode);
             setMode(newMode);
           }}
@@ -185,6 +193,7 @@ export default function CountingGame() {
         >
           <option value="browser">Browser Voice (Fast)</option>
           <option value="piper">Piper Voice (Quality)</option>
+          <option value="supertonic">Supertonic 2 (Best Quality)</option>
         </select>
       </div>
     </div>

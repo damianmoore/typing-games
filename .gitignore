@@ -2,3 +2,5 @@ node_modules
 .next
 out
 public/voices/*.onnx
+public/supertonic/onnx/*.onnx
+public/supertonic/voice_styles/*.json

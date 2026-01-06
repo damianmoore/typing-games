@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
         path: false,
         crypto: false,
       };
+
+      // Handle WASM files for ONNX Runtime
+      config.experiments = {
+        ...config.experiments,
+        asyncWebAssembly: true,
+      };
     }
     return config;
   },

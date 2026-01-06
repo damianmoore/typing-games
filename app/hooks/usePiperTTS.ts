@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { SupertonicEngine, VoiceStyle } from '../lib/supertonic';
 
-export type TTSMode = 'browser' | 'piper';
+export type TTSMode = 'browser' | 'piper' | 'supertonic';
 
 export interface PiperTTS {
   speak: (text: string) => Promise<void>;
@@ -11,6 +12,7 @@ export interface PiperTTS {
   error: string | null;
   mode: TTSMode;
   setMode: (mode: TTSMode) => void;
+  loadingStage?: string;
 }
 
 export function usePiperTTS(): PiperTTS {
@@ -18,9 +20,12 @@ export function usePiperTTS(): PiperTTS {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mode, setModeState] = useState<TTSMode>('browser');
+  const [loadingStage, setLoadingStage] = useState<string | undefined>();
   const ttsModuleRef = useRef<any>(null);
   const voiceIdRef = useRef<string>('en_GB-southern_english_female-low');
   const browserVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const supertonicRef = useRef<SupertonicEngine | null>(null);
+  const supertonicStyleRef = useRef<VoiceStyle | null>(null);
 
   // Load mode from localStorage on mount
   useEffect(() => {
@@ -111,6 +116,61 @@ export function usePiperTTS(): PiperTTS {
     };
   }, [mode]);
 
+  // Initialize Supertonic TTS only when needed
+  useEffect(() => {
+    if (typeof window === 'undefined' || mode !== 'supertonic' || supertonicRef.current) return;
+
+    let mounted = true;
+
+    const initSupertonic = async () => {
+      try {
+        setIsLoading(true);
+        setLoadingStage('Loading Supertonic...');
+
+        // Dynamic import only on client side
+        const { loadSupertonic, loadVoiceStyle } = await import('../lib/supertonic');
+
+        if (!mounted) return;
+
+        // Load the engine with progress tracking
+        const engine = await loadSupertonic('/supertonic', (progress) => {
+          if (mounted) {
+            setLoadingStage(`Loading ${progress.stage}...`);
+          }
+        });
+
+        if (!mounted) return;
+
+        supertonicRef.current = engine;
+
+        // Load default voice style (F1 - female voice)
+        setLoadingStage('Loading voice style...');
+        const style = await loadVoiceStyle('/supertonic/voice_styles/F1.json');
+
+        if (!mounted) return;
+
+        supertonicStyleRef.current = style;
+        engine.setDefaultStyle(style);
+
+        console.log('Supertonic TTS initialized');
+        setLoadingStage(undefined);
+        setIsLoading(false);
+      } catch (err) {
+        if (!mounted) return;
+        console.error('Failed to initialize Supertonic TTS:', err);
+        setError(err instanceof Error ? err.message : 'Failed to initialize Supertonic');
+        setLoadingStage(undefined);
+        setIsLoading(false);
+      }
+    };
+
+    initSupertonic();
+
+    return () => {
+      mounted = false;
+    };
+  }, [mode]);
+
   const setMode = useCallback((newMode: TTSMode) => {
     setModeState(newMode);
   }, []);
@@ -121,11 +181,14 @@ export function usePiperTTS(): PiperTTS {
       return;
     }
 
+    // Lowercase text for all TTS engines for consistent pronunciation
+    const normalizedText = text.toLowerCase();
+
     try {
       if (mode === 'browser') {
         // Use browser speechSynthesis
         if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(text);
+          const utterance = new SpeechSynthesisUtterance(normalizedText);
           utterance.rate = 0.8;
           utterance.pitch = 1;
           utterance.volume = 1;
@@ -137,7 +200,7 @@ export function usePiperTTS(): PiperTTS {
           window.speechSynthesis.cancel();
           window.speechSynthesis.speak(utterance);
         }
-      } else {
+      } else if (mode === 'piper') {
         // Use Piper TTS
         if (!ttsModuleRef.current) {
           console.warn('Piper TTS not loaded yet');
@@ -145,8 +208,30 @@ export function usePiperTTS(): PiperTTS {
         }
 
         const wav = await ttsModuleRef.current.predict({
-          text,
+          text: normalizedText,
           voiceId: voiceIdRef.current,
+        });
+
+        // Create audio from WAV blob
+        const audio = new Audio();
+        audio.src = URL.createObjectURL(wav);
+
+        // Play and cleanup
+        await audio.play();
+        audio.onended = () => {
+          URL.revokeObjectURL(audio.src);
+        };
+      } else if (mode === 'supertonic') {
+        // Use Supertonic TTS
+        if (!supertonicRef.current) {
+          console.warn('Supertonic TTS not loaded yet');
+          return;
+        }
+
+        const wav = await supertonicRef.current.synthesize(normalizedText, {
+          lang: 'en',
+          speed: 1.0,
+          totalStep: 5,
         });
 
         // Create audio from WAV blob
@@ -172,5 +257,6 @@ export function usePiperTTS(): PiperTTS {
     error,
     mode,
     setMode,
+    loadingStage,
   };
 }

@@ -368,7 +368,7 @@ export default function StartingLetterGame() {
         <select
           value={mode}
           onChange={(e) => {
-            const newMode = e.target.value as 'browser' | 'piper';
+            const newMode = e.target.value as 'browser' | 'piper' | 'supertonic';
             localStorage.setItem('ttsMode', newMode);
             setMode(newMode);
           }}
@@ -376,6 +376,7 @@ export default function StartingLetterGame() {
         >
           <option value="browser">Browser Voice (Fast)</option>
           <option value="piper">Piper Voice (Quality)</option>
+          <option value="supertonic">Supertonic 2 (Best Quality)</option>
         </select>
       </div>
 
