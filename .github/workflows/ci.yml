@@ -73,9 +73,9 @@ jobs:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
       - name: Deploy
-        run: kubectl rollout restart deployment/typing-games -n typing-games
+        run: kubectl rollout restart deployment/typing-games
 
       - name: Wait for pod to start
         run: |
           echo "Waiting for typing-games deployment to complete..."
-          kubectl rollout status deployment/typing-games -n typing-games --timeout=600s
+          kubectl rollout status deployment/typing-games --timeout=600s
