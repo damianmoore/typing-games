@@ -33,13 +33,22 @@ jobs:
           username: AWS
           password: ${{ steps.login-ecr.outputs.docker_password }}
 
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/typing-games
+          tags: |
+            type=raw,latest
+
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
           file: Dockerfile
           push: true
           platforms: linux/amd64
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
